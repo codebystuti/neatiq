@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://neatiq.netlify.app/sitemap.xml

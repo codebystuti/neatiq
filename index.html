@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeatIQ — Know Before You Pour</title>
+  <meta name="description" content="Test your alcohol awareness with 10 questions covering units, health effects, and safe limits. Educational quiz with instant feedback and score tracking." />
+  <meta name="author" content="codebystuti" />
+  <meta name="theme-color" content="#0D1F1A" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="NeatIQ — Know Before You Pour" />
+  <meta property="og:description" content="Test your alcohol awareness with 10 questions. Educational quiz with instant feedback and score tracking." />
+  <meta property="og:url" content="./" />
+  <meta property="og:image" content="./assets/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="NeatIQ" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="NeatIQ — Know Before You Pour" />
+  <meta name="twitter:description" content="Test your alcohol awareness with 10 questions. Educational quiz with instant feedback." />
+  <meta name="twitter:image" content="./assets/og-image.png" />
+
+  <link rel="canonical" href="./" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/quiz.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.18.0/dist/motion.js"></script>
+</head>
+<body>
+  <a href="#quiz-main" class="skip-link">Skip to main content</a>
+
+  <div id="quiz-app" v-cloak>
+
+    <!-- Header lives outside router-view — always visible on every route -->
+    <header class="site-header" id="site-header" :class="{ 'site-header--scrolled': headerScrolled }">
+      <div class="site-header__inner container">
+        <router-link to="/" class="site-header__logo" aria-label="NeatIQ Home">
+          <img src="./assets/q-logo.png" alt="" class="site-header__q-icon" aria-hidden="true" />
+          <span class="site-header__wordmark"><span class="site-header__wordmark-neat">Neat</span><span class="site-header__wordmark-iq">IQ</span></span>
+        </router-link>
+
+        <div class="site-header__spacer"></div>
+        <p class="site-header__tagline">Know Before You Pour</p>
+
+        <button class="theme-toggle" @click="toggleTheme" :aria-label="'Switch to ' + (isDark ? 'light' : 'dark') + ' theme'">
+          <i class="fa-solid fa-moon theme-toggle__icon" v-if="isDark"></i>
+          <i class="fa-solid fa-sun theme-toggle__icon" v-else></i>
+          <span class="theme-toggle__track" :class="{ 'theme-toggle__track--light': !isDark }">
+            <span class="theme-toggle__knob"></span>
+          </span>
+          <span class="theme-toggle__label">{{ isDark ? 'Dark' : 'Light' }}</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Vue Router renders the active route component here -->
+    <main id="quiz-main">
+      <router-view v-slot="{ Component, route }">
+        <transition :name="route.meta.transition || 'route-slide'" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </transition>
+      </router-view>
+    </main>
+
+    <!-- Footer — also outside router-view -->
+    <footer class="site-footer">
+      <div class="site-footer__hero">
+        <img src="./assets/hero-bg.jpg" alt="" aria-hidden="true" class="site-footer__hero-img" />
+        <div class="site-footer__hero-overlay"></div>
+      </div>
+      <div class="site-footer__inner container">
+        <div class="site-footer__top">
+          <router-link to="/" class="site-footer__logo" aria-label="NeatIQ Home">
+            <img src="./assets/q-logo.png" alt="NeatIQ" class="site-footer__q-icon" />
+          </router-link>
+          <p class="site-footer__desc">
+            NeatIQ is an educational quiz about alcohol awareness. It is not medical advice.
+            Always drink responsibly and follow the guidelines in your region.
+          </p>
+        </div>
+        <div class="site-footer__divider"></div>
+        <div class="site-footer__bottom">
+          <p class="site-footer__copy">© 2026 NeatIQ</p>
+          <p class="site-footer__built">Built with ♥ by <a href="https://github.com/codebystuti" target="_blank" rel="noopener noreferrer">codebystuti</a></p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Load order matters: data → store → components → router → app -->
+  <script src="./js/data.js"></script>
+  <script src="./js/quizStore.js"></script>
+  <script src="./src/components/SettingsPanel.js"></script>
+  <script src="./src/components/ScoreHistory.js"></script>
+  <script src="./src/components/QuizLanding.js"></script>
+  <script src="./src/components/QuizProgress.js"></script>
+  <script src="./src/components/FeedbackPanel.js"></script>
+  <script src="./src/components/McqQuestion.js"></script>
+  <script src="./src/components/DragDropQuestion.js"></script>
+  <script src="./src/components/PollQuestion.js"></script>
+  <script src="./src/components/AnswerReview.js"></script>
+  <script src="./src/components/QuizPlay.js"></script>
+  <script src="./src/components/QuizResults.js"></script>
+  <script src="./src/router/index.js"></script>
+  <script src="./js/app.js"></script>
+
+</body>
+</html>
