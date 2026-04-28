@@ -219,7 +219,7 @@
 
 @media (max-width: 767px) {
   .mcq__right {
-    min-height: 250px;
+    min-height: auto;
   }
 
   .results-meter__score {

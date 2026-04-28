@@ -60,11 +60,13 @@ const QuizResults = {
       this.showResults = true;
     }, 100);
 
+    // watch for showResults to trigger animations after DOM is ready
     this.$watch('showResults', (val) => {
       if (!val) return;
       this.$nextTick(() => {
         const arc = this.$el.querySelector('.results-meter__arc');
 
+        // snap arc to zero with no transition
         if (arc) arc.style.transition = 'none';
         this.meterAnimating = false;
         this.arcOffset = 754;
@@ -82,6 +84,11 @@ const QuizResults = {
             this.knobAngle = this.targetKnobAngle;
             this.animateScoreCount();
             setTimeout(() => this.setupScrollAnimations(), 200);
+
+            // confetti on perfect score — fires after arc animation finishes
+            if (this.scoreOutOf10 === 10) {
+              setTimeout(() => this.launchConfetti(), 3800);
+            }
           });
         });
       });
@@ -103,7 +110,7 @@ const QuizResults = {
       const target = this.scoreOutOf10;
       this.displayScore = 0;
       if (target <= 0) return;
-      const duration = 1800;
+      const duration = 3500;
       const start = performance.now();
       const step = (now) => {
         const progress = Math.min((now - start) / duration, 1);
@@ -136,6 +143,10 @@ const QuizResults = {
             this.arcOffset = this.targetArcOffset;
             this.knobAngle = this.targetKnobAngle;
             this.animateScoreCount();
+
+            if (this.scoreOutOf10 === 10) {
+              setTimeout(() => this.launchConfetti(), 3800);
+            }
           });
         });
       });
@@ -257,6 +268,65 @@ const QuizResults = {
       if (c.includes('mind')) return 'tag--mind';
       if (c.includes('relationship')) return 'tag--relationships';
       return 'tag--alcohol';
+    },
+
+    launchConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      const colors = ['#C9A84C', '#E8D5A0', '#5DBE85', '#F2EDE4', '#D97B5A', '#9DB8AF'];
+      const pieces = [];
+
+      for (let i = 0; i < 120; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height * -1,
+          w: Math.random() * 8 + 4,
+          h: Math.random() * 6 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vy: Math.random() * 3 + 2,
+          vx: (Math.random() - 0.5) * 2,
+          rot: Math.random() * 360,
+          spin: (Math.random() - 0.5) * 8,
+          opacity: 1,
+        });
+      }
+
+      let frame = 0;
+      const maxFrames = 180;
+
+      const draw = () => {
+        frame++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.04;
+          p.rot += p.spin;
+          if (frame > maxFrames - 40) p.opacity = Math.max(0, p.opacity - 0.025);
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+
+        if (frame < maxFrames) {
+          requestAnimationFrame(draw);
+        } else {
+          canvas.remove();
+        }
+      };
+
+      requestAnimationFrame(draw);
     },
   },
 
@@ -393,9 +463,7 @@ const QuizResults = {
               </div>
             </div>
           </section>
-
         </div>
-
       </div>
     </transition>
   `,

@@ -48,8 +48,6 @@ const McqQuestion = {
     selectAnswer(option, index) {
       if (this.isAnswered) return;
       this.isAnswered = true;
-
-      // Lock all options
       const allOpts = this.$el.querySelectorAll('.mcq__option');
       allOpts.forEach(el => el.classList.add('mcq__option--locked'));
       this.$el.querySelectorAll('.mcq__option-input')
@@ -65,8 +63,11 @@ const McqQuestion = {
         if (this.instantFeedback) {
           setTimeout(() => { this.showCorrectPanel = true; }, 1800);
         } else {
-          // no-feedback mode
-          setTimeout(() => { this.emitAnswer(isCorrect); }, 1200);
+          setTimeout(() => {
+            this.revealCorrect = false;
+            this.selectedOptionIndex = -1;
+            setTimeout(() => this.emitAnswer(isCorrect), 300);
+          }, 1200);
         }
       } else {
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -76,7 +77,11 @@ const McqQuestion = {
         if (this.instantFeedback) {
           setTimeout(() => { this.showIncorrectPanel = true; }, 1800);
         } else {
-          setTimeout(() => { this.emitAnswer(isCorrect); }, 1600);
+          setTimeout(() => {
+            this.revealCorrect = false;
+            this.selectedOptionIndex = -1;
+            setTimeout(() => this.emitAnswer(isCorrect), 300);
+          }, 1600);
         }
       }
     },
@@ -96,7 +101,6 @@ const McqQuestion = {
       if (this.isProcessingNext) return;
       this.isProcessingNext = true;
       const isCorrect = this.selectedOptionIndex === this.correctIndex;
-
       // hide the panel first, then emit after it slides out
       this.showCorrectPanel = false;
       this.showIncorrectPanel = false;
